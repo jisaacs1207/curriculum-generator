@@ -33,7 +33,7 @@ src/
   ...
 functions/api/        # Cloudflare Pages Functions (OpenRouter proxy, page settings, magic-link auth)
 server/proxy.js       # Local Node: OpenRouter + Puppeteer PDF + auth parity
-wrangler.toml         # Pages build dir + D1 binding name (replace database_id)
+wrangler.toml         # Pages build dir (D1 bind in dashboard as AUTH_DB; see file comments for local D1)
 migrations/           # D1 SQL for magic_tokens
 .github/workflows/ci.yml   # npm ci + build (no Cloudflare deploy — avoids double deploy)
 ```
@@ -60,8 +60,8 @@ This repo includes **`.github/workflows/ci.yml`** which runs `npm ci` and `npm r
 
 ### 2. D1 (magic-link state only)
 
-1. **D1** → Create database (e.g. `curriculum-auth`) → copy **database_id**.
-2. In **`wrangler.toml`**, set `database_id` under `[[d1_databases]]` (replace the placeholder), or bind **AUTH_DB** in the Pages project: **Settings → Functions → D1 database bindings** → variable name **`AUTH_DB`**.
+1. **D1** → Create database (e.g. `curriculum-auth`) → copy **database_id** (only needed for local `wrangler` / optional `wrangler.toml` block).
+2. **Pages project** → **Settings** → **Functions** → **D1 database bindings** → add **`AUTH_DB`** → select that database. **Do not** put a placeholder UUID in `wrangler.toml`; Cloudflare rejects it at deploy (**Error 8000022**). Repo ships with D1 commented out so Git deploys succeed; bind D1 in the dashboard.
 3. Apply migrations to the remote database:
 
 ```bash
@@ -74,7 +74,7 @@ For local `wrangler pages dev` with D1:
 npx wrangler d1 migrations apply curriculum-auth --local
 ```
 
-Use the **`database_name`** value from `wrangler.toml` (here `curriculum-auth`), not the binding name `AUTH_DB`.
+Use the **database name** you created in the dashboard (e.g. `curriculum-auth`), not the Pages binding name `AUTH_DB`.
 
 Schema: `magic_tokens(token_hash, email, expires_at, used_at)` — only a **SHA-256 hex** of the opaque token is stored.
 

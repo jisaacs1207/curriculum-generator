@@ -2,11 +2,11 @@
 # Deploy: connect GitHub in dashboard (recommended) or:
 #   npm run build && npx wrangler pages deploy dist --project-name=<your-project>
 #
-# Replace DATABASE_ID below with your D1 database id (Workers & Pages → D1 → copy id).
-# Apply migrations (once per DB):
-#   npx wrangler d1 migrations apply AUTH_DB --remote
-# Local apply for wrangler dev:
-#   npx wrangler d1 migrations apply AUTH_DB --local
+# D1 (AUTH_DB): do NOT commit a fake database_id — deploy will fail (Error 8000022).
+#   • Production: Pages → Settings → Functions → D1 database bindings → name AUTH_DB → pick your DB.
+#   • Migrations (once per database): npx wrangler d1 migrations apply <database-name> --remote
+#     Use the database *name* you chose in the dashboard (e.g. curriculum-auth). SQL lives in migrations/.
+#   • Local wrangler pages dev: optionally add [[d1_databases]] below with your real database_id from D1.
 #
 # Secrets (never commit; use dashboard or wrangler pages secret put):
 #   OPENROUTER_API_KEY, JWT_SECRET, BREVO_API_KEY,
@@ -21,11 +21,13 @@ name = "curriculum-generator"
 compatibility_date = "2025-04-01"
 pages_build_output_dir = "dist"
 
-[[d1_databases]]
-binding = "AUTH_DB"
-database_name = "curriculum-auth"
-database_id = "00000000-0000-0000-0000-000000000001"
-migrations_dir = "migrations"
+# Optional: uncomment and set database_id to YOUR real UUID from Workers & Pages → D1
+# (needed for `wrangler pages dev` to hit D1 locally — not required for dashboard-only Pages deploys.)
+# [[d1_databases]]
+# binding = "AUTH_DB"
+# database_name = "curriculum-auth"
+# database_id = "<paste-real-uuid-from-dashboard>"
+# migrations_dir = "migrations"
 
 # Optional: uncomment after creating a KV namespace (wrangler kv namespace create PAGE_SETTINGS)
 # [[kv_namespaces]]
