@@ -1,0 +1,33 @@
+# Cloudflare Pages: static build + Functions under functions/
+# Deploy: connect GitHub in dashboard (recommended) or:
+#   npm run build && npx wrangler pages deploy dist --project-name=<your-project>
+#
+# Replace DATABASE_ID below with your D1 database id (Workers & Pages → D1 → copy id).
+# Apply migrations (once per DB):
+#   npx wrangler d1 migrations apply AUTH_DB --remote
+# Local apply for wrangler dev:
+#   npx wrangler d1 migrations apply AUTH_DB --local
+#
+# Secrets (never commit; use dashboard or wrangler pages secret put):
+#   OPENROUTER_API_KEY, JWT_SECRET, BREVO_API_KEY,
+#   MAGIC_LINK_FROM_EMAIL, MAGIC_LINK_FROM_NAME (optional name),
+#   ADMIN_EMAIL_ALLOWLIST (comma-separated),
+#   APP_ORIGIN (https://your-project.pages.dev or custom domain),
+#   Optional break-glass: PAGE_SETTINGS_ADMIN_TOKEN
+#
+# Public build vars (VITE_*): VITE_OPENROUTER_PROXY=/api, PostHog keys, etc.
+
+name = "curriculum-generator"
+compatibility_date = "2025-04-01"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "AUTH_DB"
+database_name = "curriculum-auth"
+database_id = "00000000-0000-0000-0000-000000000001"
+migrations_dir = "migrations"
+
+# Optional: uncomment after creating a KV namespace (wrangler kv namespace create PAGE_SETTINGS)
+# [[kv_namespaces]]
+# binding = "PAGE_SETTINGS"
+# id = "<your-kv-namespace-id>"
